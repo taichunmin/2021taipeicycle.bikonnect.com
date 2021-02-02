@@ -1,0 +1,38 @@
+extends /layout/default
+
+block beforehtml
+  - const title = '台北國際自行車展覽會'
+
+block style
+  style
+    :sass
+      [v-cloak]
+        display: none
+
+block content
+  #app.container(v-cloak)
+
+block script
+  script(src="https://static.line-scdn.net/liff/edge/2/sdk.js")
+  script.
+    /* global JSON5 */
+    window.getSearchParam = key => (new URL(window.location).searchParams.get(key))
+    window.httpBuildQuery = obj => Qs.stringify(obj, { arrayFormat: 'brackets' })
+    window.sleep = t => new Promise(resolve => { setTimeout(resolve, t) })
+    window.parseJsonOrDefault = (str, defaultValue) => {
+      try {
+        if (!_.isString(str)) return defaultValue
+        return JSON5.parse(str)
+      } catch (err) {
+        return defaultValue
+      }
+    }
+    const loginPromise = (async () => {
+      await liff.init({ liffId: '#{liffidFull}' })
+      if (window.getSearchParam('liff.state')) await new Promise(resolve => {}) // 永遠不會結束的 Promise
+      if (!liff.isLoggedIn()) {
+        liff.login({ redirectUri: location.href })
+        await new Promise(resolve => {}) // 永遠不會結束的 Promise
+      }
+      return await liff.getProfile().catch(() => null)
+    })()
