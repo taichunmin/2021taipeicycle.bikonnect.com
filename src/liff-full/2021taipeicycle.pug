@@ -8,9 +8,43 @@ block style
     :sass
       [v-cloak]
         display: none
+      body
+        background-color: #002855
+      .text-purple
+        color: #0078ff
+      #app
+        max-width: 760px
 
 block content
-  #app.container(v-cloak)
+  .min-vh-100
+    #app.container.text-monospace(v-cloak)
+      .page-q1.pt-5(v-if="page === 'q1'")
+        h1.mb-3.text-purple Q1:
+        h4.text-white.mb-5 請問您是如何知道微程式攤位？
+        template(v-for="v, k in {A: '無意間逛到', B: '朋友 LINE 推薦分享', C: '本來就對微程式產品有興趣'}")
+          button.mb-3.text-left.btn.btn-lg.btn-light.btn-block(type="button", :key="`q1-${k}`", @click="answer(1, v)") {{ k }}: {{ v }}
+        button.mb-3.text-left.btn.btn-lg.btn-light.btn-block(type="button", @click="answer(1, '')") D: 其他
+      .page-q2.pt-5(v-else-if="page === 'q2'")
+        h1.mb-3.text-purple Q2:
+        h4.text-white.mb-5 微程式推出的自行車 IoT 品牌是什麼？
+        template(v-for="v, k in {A: 'Bikonnect', B: '天竺鼠車車'}")
+          button.mb-3.text-left.btn.btn-lg.btn-light.btn-block(type="button", :key="`q2-${k}`", @click="answer(2, v)") {{ k }}: {{ v }}
+      .page-q3.pt-5(v-else-if="page === 'q3'")
+        h1.mb-3.text-purple Q3:
+        h4.text-white.mb-5 Bikonnect 品牌的意思？
+        button.mb-3.text-left.btn.btn-lg.btn-light.btn-block(type="button", key="q3-A", @click="answer(3, '最酷炫的 Bike')") A: 最酷炫的 Bike
+        button.mb-3.text-left.btn.btn-lg.btn-light.btn-block(type="button", key="q3-B", @click="answer(3, 'Bike + Connect')")
+          | B: Bike + Connect#[br]&nbsp;&nbsp;&nbsp;
+          small 物連網自行車，智慧連結無限可能
+      .page-q4.pt-5(v-else-if="page === 'q4'")
+        h1.mb-3.text-purple Q4:
+        h4.text-white.mb-5 請填寫希望在 E-Bike APP 中要有的功能？ (至少 2 個)
+        textarea.mb-3.form-control(rows="10")
+        button.mb-3.btn.btn-lg.btn-primary.d-block.mx-auto(type="button", @click="answer(4, '')") 送出
+      .page-share.pt-5(v-else-if="page === 'share'")
+        h1.mb-3.text-purple 最後一步
+        h4.text-white.mb-5 再來只要透過 LINE 分享攤位資訊給好友，就能憑手機畫面到攤位領取小禮物喔！
+        button.mb-3.btn.btn-lg.btn-success.btn-block(type="button", key="share") 選擇好友分享攤位資訊
 
 block script
   script(src="https://static.line-scdn.net/liff/edge/2/sdk.js")
@@ -36,3 +70,27 @@ block script
       }
       return await liff.getProfile().catch(() => null)
     })()
+    window.vm = new Vue({
+      el: '#app',
+      data: {
+        page: 'q1',
+      },
+      methods: {
+        answer (qid, value) {
+          switch (qid) {
+            case 1:
+              this.page = 'q2'
+              break
+            case 2:
+              this.page = 'q3'
+              break
+            case 3:
+              this.page = 'q4'
+              break
+            case 4:
+              this.page = 'share'
+              break
+          }
+        },
+      },
+    })
